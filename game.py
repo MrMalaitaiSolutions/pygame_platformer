@@ -11,13 +11,14 @@ def load_map(path):
     for row in data:
         game_map.append(list(row))
     return game_map
-    
+
 def collision_test(rect,tiles):
     hit_list = []
     for tile in tiles:
         if rect.colliderect(tile):
             hit_list.append(tile)
     return hit_list
+
 def move(rect,movement,tiles):
     collision_types = {'top':False,'bottom':False,'right':False,'left':False}
     rect.x += movement[0]
@@ -39,7 +40,7 @@ def move(rect,movement,tiles):
             rect.top = tile.bottom
             collision_types['top'] = True
     return rect, collision_types
-    
+
 clock = pygame.time.Clock()
 pygame.init() # initiates pygame
 pygame.display.set_caption('Pygame Platformer')
@@ -54,9 +55,11 @@ true_scroll = [0,0]
 game_map = load_map('map')
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
+desk_img = pygame.image.load('desk.png')
 player_img = pygame.image.load('player.png').convert()
 player_img.set_colorkey((255,255,255))
 player_rect = pygame.Rect(100,100,5,13)
+
 while True: # game loop
     display.fill((146,244,255)) # clear screen by filling it with blue
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20 # a number lower than 20 speeds up the parallax
@@ -73,7 +76,7 @@ while True: # game loop
             if tile == '1':
                 display.blit(dirt_img,(x*16-scroll[0],y*16-scroll[1]))
             if tile == '2':
-                display.blit(grass_img,(x*16-scroll[0],y*16-scroll[1]))
+                display.blit(desk_img,(x*16-scroll[0],y*16-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x*16,y*16,16,16))
             x += 1
