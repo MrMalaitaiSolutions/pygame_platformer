@@ -2,6 +2,7 @@
 # Date: 31/08/2020
 import pygame, sys
 from pygame.locals import *
+
 def load_map(path):
     f = open(path + '.txt','r')
     data = f.read()
@@ -18,6 +19,7 @@ def collision_test(rect,tiles):
         if rect.colliderect(tile):
             hit_list.append(tile)
     return hit_list
+
 def move(rect,movement,tiles):
     collision_types = {'top':False,'bottom':False,'right':False,'left':False}
     rect.x += movement[0]
@@ -39,7 +41,7 @@ def move(rect,movement,tiles):
             rect.top = tile.bottom
             collision_types['top'] = True
     return rect, collision_types
-    
+
 clock = pygame.time.Clock()
 pygame.init() # initiates pygame
 pygame.display.set_caption('Pygame Platformer')
@@ -52,11 +54,19 @@ vertical_momentum = 0
 air_timer = 0
 true_scroll = [0,0]
 game_map = load_map('map')
-grass_img = pygame.image.load('grass.png')
-dirt_img = pygame.image.load('dirt.png')
-player_img = pygame.image.load('player.png').convert()
+grass_img = pygame.image.load('images/grass.png')
+dirt_img = pygame.image.load('images/dirt.png')
+player_img = pygame.image.load('images/player.png').convert()
+
+jump_sound = pygame.mixer.Sound('audio/jump.wav')
+
+pygame.mixer.music.load('audio/music.wav') # Audio for music
+pygame.mixer.music.play(-1) # Play the audio for music.  -1 is so that it loops indefinitely
+
 player_img.set_colorkey((255,255,255))
 player_rect = pygame.Rect(100,100,5,13)
+
+
 while True: # game loop
     display.fill((146,244,255)) # clear screen by filling it with blue
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20 # a number lower than 20 speeds up the parallax
@@ -78,13 +88,14 @@ while True: # game loop
                 tile_rects.append(pygame.Rect(x*16,y*16,16,16))
             x += 1
         y += 1
+
     player_movement = [0,0]
     if moving_right == True:
-        player_movement[0] += 2
+        player_movement[0] += 2 # Player speed moving to the right
     if moving_left == True:
-        player_movement[0] -= 2
+        player_movement[0] -= 2 # Player speed moving to the left
     player_movement[1] += vertical_momentum
-    vertical_momentum += 0.2
+    vertical_momentum += 0.2 # Time in the air
     if vertical_momentum > 3:
         vertical_momentum = 3
     player_rect,collisions = move(player_rect,player_movement,tile_rects)
@@ -105,6 +116,7 @@ while True: # game loop
             if event.key == K_LEFT:
                 moving_left = True
             if event.key == K_UP:
+                jump_sound.play() # Plays the jump sound when pressing up
                 if air_timer < 6:
                     vertical_momentum = -5
         if event.type == KEYUP:
